@@ -1,0 +1,32 @@
+mutation {
+    signUp(email: "alalstjr@naver.com", username: "alalstjr", name: "Alex", password: "a123456789") {
+        id
+    }
+}
+
+mutation {
+    signIn(email: "alalstjr@naver.com", password: "a123456789") {
+        id
+    }
+}
+
+mutation {
+    signOut
+}
+
+{
+    me {
+        id
+        name
+        email
+    }
+}
+
+{
+    users {
+        id
+        chats {
+            id
+        }
+    }
+}

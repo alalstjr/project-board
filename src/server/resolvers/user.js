@@ -1,30 +1,41 @@
-import mongoose from 'mongoose';
-import { UserInputError } from 'apollo-server-express';
+
 import { User } from '../models';
+import Joi from 'joi';
+import { signUp, signIn } from '../schemas';
+import { attempSignIn, signOut } from '../action/auth';
 
 export default {
     Query: {
-        users: (root, args, context, info) => {
-            // TODO: auth, projection, pagination
+        me: (root, args, {req}, info) => {
 
-            return User.find({})
+            return User.findById(req.session.userId);
         },
-        user: (root, { id }, context, info) => {
-            // TODO: auth, projection, sanitization
+        user: (root, args, context, info) => {
 
-            if( !mongoose.Types.ObjectId.isValid(id) ) {
-                throw new UserInputError(`UserID: ${id} 가 존재하지 않습니다.`);
-            }
-
-            return User.findById(id);
+            return User.findById(args.id);
         }
     },
     Mutation: {
-        singUp: (root, args, context, info) => {
+        signUp : async (root, args, { req }, info) => {
+            await Joi.validate(args, signUp, { abortEarly: false });
 
-            const password = args.password
+            const user = await User.create(args);
+            
+            req.session.userId = user.id
 
-            return User.create(args);
+            return user;
+        },
+        signIn : async (root, args, { req }, info) => {
+            await Joi.validate(args, signIn, { abortEarly: false });
+            
+            const user = await attempSignIn(args.email, args.password);
+            
+            req.session.userId = user.id
+
+            return user;
+        },
+        signOut : async (root, args, { req, res }, info) => {
+            return signOut(req, res);
         }
     }
 }

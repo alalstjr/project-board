@@ -2,9 +2,13 @@
 import { ApolloServer } from "apollo-server-express";
 import typeDefs from './typeDefs';
 import resolvers from './resolvers';
+import schemaDirectives from './directives';
 
 // Express
 import express from 'express';
+import session from 'express-session';
+import connectRedis from 'connect-redis';
+import path from 'path';
 
 // mongoose
 import mongoose from 'mongoose';
@@ -22,22 +26,61 @@ import {IN_PROD, SESS_NAME, SESS_SECRET, SESS_LIFETIME, PREDIS_HOST, PREDIS_PORT
         const app = express();
 
         app.disable('x-powered-by');
-        // 웹상에 개발 환경이 노출되지 않도록 보안작업
+        
+        const RedisStore = connectRedis(session);
+        const store = new RedisStore({
+            host: PREDIS_HOST,
+            port: PREDIS_PORT,
+            password: PREDIS_PASSWORD
+        });
+
+        app.use(session({
+            store,
+            name: SESS_NAME,
+            secret: SESS_SECRET,
+            resave: true,
+            rolling: true,
+            saveUninitialized: false,
+            cookie: {
+                maxAge: parseInt(SESS_LIFETIME),
+                sameSite: true,
+                secure: IN_PROD
+            }
+        }));
 
         const server = new ApolloServer({
             typeDefs,
             resolvers,
-            playground: !IN_PROD,
+            schemaDirectives,
+            cors: false,
+            playground: IN_PROD ? false : {
+                settings: {
+                    'request.credentials': 'include'
+                }
+            },
             context: ({req, res}) => ({req, res})
         });
 
+        app.use('/', express.static(path.resolve(__dirname, '../../build')));
+
+        // app.use('/api', api);
+        /* support client-side routing */
+        app.get('*', (req, res) => {
+            res.sendFile(path.resolve(__dirname, './../../build/index.html'));
+        });
+
+        app.get('/login', (req, res) => {
+            console.log('로그인')
+            res.send('로그인')
+        });
+        
         server.applyMiddleware({ app });
 
         app.listen({ port: APP_PORT }, () => 
             console.log(`localhost:${APP_PORT}:${server.graphqlPath}`)
         );
+
     } catch(e) {
         console.error(e);
     }
 })()
-

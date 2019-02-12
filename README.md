@@ -320,3 +320,202 @@ typeDefs 에서는 Schema 를 정의해주는 폴더
 resolvers 에서는 해석해 주고 명령을 실행시켜주는 곳
 
 models 에서는 mogoose 서버로 전달해 주는곳
+
+# mongoose 터미널 연결 하기
+$ mongo --help
+$ mongo chat --host <host> --port <port> -u <user> --authenticationDatabase chat
+
+# mongoose 유효성 검사 - 이미 존재하는 값 체크
+
+https://mongoosejs.com/docs/validation.html#custom-validators
+https://www.youtube.com/watch?v=90h2MeBnfig&index=8&list=PLcCp4mjO-z9_y8lByvIfNgA_F18l-soQv
+
+models/user.js
+
+const userSchema = new mongoose.Schema({
+    email: {
+        type: String,
+        validate: {
+            validator: async email => await User.where({ email: email }).countDocuments() === 0,
+            message: ({ value }) => `Email ${value} 은 이미 존재합니다.`
+        }
+    },
+)}
+
+# 진행 방향
+
+1. server/index.js > typeDefs 와 resolvers 를 연결
+
+2. typeDefs 
+
+typeDef 란 자료형(type)을 정의(define) 하는것	
+
+3. resolvers
+
+Resolver 란, query에서 특정 필드에 대한 요청이 있을 때, 
+그것을 어떤 로직으로 처리할지 GraphQL에게 알려주는 역할
+
+4. resolvers 에서 검색 유저의 상태 파악 후 반환
+
+auth.js 로 이동 해당 유저의 Query 가 서버값과 일치하는지 검사
+or
+현재 유저의 상태를 확인후 return
+
+로그아웃의경우 쿠키를 바로 삭제 signOut
+
+5. auth의 검사후 문제가 없을경우 
+
+-1. Query 경우 바로 해당 목록을 검색
+
+-2. Mutation 경우 Joi 유효성 검사를 실시
+
+동적으로 실시한다 Joi 이때 보내지는것이 schemas 파일 유효성 검사파일
+
+이상이 없다면 User.create() 실행 후 값을 몽고db에 저장하기 위해 models 로 이동 
+
+
+# 채팅 기능 만들기
+
+1. typeDefs 
+
+첫번째로 typeDef 자료형(type)을 정의(define) 하는것
+chat 과 message 를 정의합니다.
+
+- 1. chat 
+    type Chat {
+        id: ID!                 -- 고유 아이디값
+        title: String!          -- 채팅의 제목
+        users: [User!]!         -- 채팅에 속한 유저 목록
+        messages: [Message!]!   -- 채팅의 메세지
+        createdAt: String!      -- 만든날짜
+        updatedAt: String!      -- 보낸날짜
+    }
+
+    extend type Mutation {
+        startChat(title: String, userIds: [ID!]!): Chat @auth 
+        -- @auth로 인해 유저일경우에만 채팅 가능
+    }
+
+- 2. message
+    type Message {
+        id: ID!                 -- 고유 아이디값
+        body: String!           -- 채팅의 내용
+        sender User!            -- 메세지를 보낸 유저
+        createdAt: String!      -- 만든날짜
+        updatedAt: String!      -- 보낸날짜
+    }
+
+- 3. user
+    type User {
+        ...code...
+        chats: [Chat!]!         -- 해당 유저의 채팅 목록 추가
+        updatedAt: String!      -- 보낸날짜
+    } 
+
+2. models 
+어떤 로직으로 처리할지 GraphQL에게 알려주는 역할을 chat 과 message 생성
+
+models/user.js
+import mongoose, { Schema } from 'mongoose';
+Schema 를 불러오고
+userSchema 에 chats 추가
+    chats: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Chat'
+    }],
+
+models/user && models/chat 
+
+typeDefs 에 정의한 값을 mongoose.model 에서 생성합니다.
+
+import mongoose, { Schema } from 'mongoose';
+const { ObjectId } = Schema.Types;
+const messageSchema = new Schema({
+    body: String,
+    sender: {
+        type: ObjectId,
+        ref: 'User'
+    },
+    chat: {
+        type: ObjectId,
+        ref: 'User'
+    }
+},{
+    timestamps: true
+});
+
+export default mongoose.model('Message', messageSchema);
+
+3. resolvers 
+query에서 특정 필드에 대한 요청이 있을 때, 
+그것을 어떤 로직으로 처리할지 GraphQL에게 알려주는 역할
+
+resolvers/chat.js 를 생성
+
+유효성 검사를 위해 schemas 를 생성 합니다.
+import { startChat } from '../schemas';
+
+다음 startChat() Joi 로 userId 를 보내 유효성 검사를 실시합니다.
+await Joi.validate(args, startChat(userId), { abortEarly: false });
+
+4. schemas
+schemas/chat.js 를 생성
+
+chat의 배열을 유효성 검사를 하기위해 Joi.array() 사용
+
+chat.js 에서 import Joi from './joi'; joi 라는 js 파일을 따로 만들어서 사용하는것을 볼수 있다
+chat.js 유효성 검사는 채팅을 하는 user 가 본인이 맞는지도 같이 체크해야 하기 때문에 추가적으로
+Joi 기능을 커스텀 해야하기 때문이다.
+이를 구현하기위해 extend 확장 기능을 사용한다.
+https://github.com/hapijs/joi/blob/v14.3.1/API.md#extendextension
+
+joi.js 를 생성하여 확장 Joi 를 만듭니다.
+
+정상적으로 채팅의 유효성이 끝났다면 resolvers/chat.js 이동합니다.
+
+Chat.create({ title, users: userIds })
+chat 을 생성하여 추가할 준비를 하고
+mongosee User.updateMany 를 활용하여 chat을 업데이트 합니다.
+
+5. 
+{
+    users {
+        id
+        chats {
+            id
+        }
+    }
+}
+오류가 날것 배열을 출력을 못하는것 뇌피셜..
+resolves 에서  return (await user.populate('chats').execPopulate()).chats
+사용함으로서 배열을 추가하는것
+
+6. chat message 기능 넣기
+
+resolves/chat.js 
+message 의 요청 행위를 정합니다.
+
+Chat:  messages 를 models/message 로 값을 return 합니다.
+
+{
+  users {
+    id
+    chats {
+      id
+      users {
+        id
+      }
+
+    }
+  }
+}
+
+명령어를 하면 위에 오류가 나는것처럼
+ "ID cannot represent value: <Buffer 5c 5d b5 64 f3 f1 79 47 9c c7 a9 e7>",
+ 이또한 users 의 배열을 출력 못해서 인듯 하다.
+
+ 7. chat title 추가하기 
+
+ resolves/chat.js 에서
+ startChat을 실행과 동시에 Chat.create 으로 moduls/chat.js 로 이동
+ title 을 지정해 준다.

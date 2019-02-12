@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Auth from 'components/Auth';
 
-class Login extends Component {
+class Register extends Component {
     render(){
         return(
             <Auth auth={false} />
@@ -9,4 +9,4 @@ class Login extends Component {
     }
 }
 
-export default Login;
+export default Register;
