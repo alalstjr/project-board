@@ -1,9 +1,6 @@
-import styled, {css} from 'styled-components';
-import {ListStyle} from './globalStyles';
+import styled from 'styled-components';
+import { ListStyle, BoxGap } from './globalStyles';
 
-export const PosterGap = css`
-    padding: 0 10px;
-`;
 export const BoardListBox = styled.div`
     width: 660px;
     float: left;
@@ -36,12 +33,12 @@ export const PosterEct = styled.div`
     padding: 10px;
 `;
 export const PosterViews = styled.div`
-    ${PosterGap}
+    ${BoxGap}
     font-weight: 600;
     margin-bottom: 8px;
 `;
 export const PosterPost = styled.div`
-    ${PosterGap}
+    ${BoxGap}
     padding-top: 8px;
     padding-bottom: 8px;
 `;
@@ -49,10 +46,10 @@ export const PosteDate = styled.div`
     margin-bottom: 8px;
 `;
 export const PosterTag = styled.div`
-    ${PosterGap}
+    ${BoxGap}
 `;
 export const PosterComment = styled.div`
-    ${PosterGap}
+    ${BoxGap}
 `;
 export const PosterCommentBox = styled.ul`
     margin-bottom: 4px;
@@ -65,10 +62,11 @@ export const PosterCommentWrite = styled.div`
     border-top: ${props => props.theme.borderSet};
 `;
 export const PosterCommentTextarea = styled.textarea.attrs({
-    placeholder: 'Comment..'
+    placeholder: `${props => props.placeholder}`
 })`
     resize: none;
     width: 100%;
     border: none;
     outline: none !important;
+    height: 100%;
 `;

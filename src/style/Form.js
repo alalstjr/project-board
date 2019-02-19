@@ -23,3 +23,16 @@ export const Input = styled.input`
     padding: 4px;
     box-sizing: border-box;
 `;
+export const CloseBtn = styled.div`
+    float: right;
+    padding: 0 10px;
+    cursor: pointer;
+`;
+export const TagInput = styled.input.attrs({
+    placeholder: 'tags'
+})`
+    border: none;
+    outline: none;
+    width: auto;
+    padding: 5px;
+`;

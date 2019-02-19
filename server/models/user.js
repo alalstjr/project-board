@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
             message: ({ value }) => `Email ${value} 은 이미 존재합니다.`
         }
     },
+    username: String,
     createdAt: String,
     password: String
 },{

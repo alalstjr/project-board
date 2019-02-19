@@ -1,11 +1,11 @@
-// import { gql } from 'react-apollo';
-import { gql } from "apollo-boost";
+import gql from 'graphql-tag';
 
 export const USER = gql`
-    query {
+    query userAuth {
         me {
             id
             email
+            username
         }
     }
 `;

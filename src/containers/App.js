@@ -1,29 +1,39 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { USER } from "module/Query";
+import { graphql } from 'react-apollo';
 // React-Router-v4
 import { BrowserRouter as Router, Route } from "react-router-dom";
-// React-Apollo
-import { ApolloProvider } from "react-apollo";
-import client from "module/apolloClient";
 // Contains
 import Home from './Home';
 import Login from './Login';
 import Register from './Register';
 
+const App = ({ loading, me }) => {
+  if(loading) return null;
+  // (<PosterImg src={require("../img/loading.gif")}/>)
+  
+  let userState = me ? true : false;
 
-class App extends Component {
-  render() {
-    return (
-      <ApolloProvider client={client}>
-        <Router>
-          <React.Fragment>
-            <Route exact={true} path={'/'} component={Home} />
-            <Route path={'/login'} component={Login} />
-            <Route path={'/register'} component={Register} />
-          </React.Fragment>
-        </Router>
-      </ApolloProvider>
-    );
-  }
+  return (
+    <Router>
+      <React.Fragment>
+        <Route 
+          exact={true} 
+          path={'/'} 
+          component={ () => <Home userState={userState} user={me} /> } 
+        />
+        <Route path={'/login'} component={Login} />
+        <Route path={'/register'} component={Register} />
+      </React.Fragment>
+    </Router>
+  );
 }
 
-export default App;
+export default graphql(
+  USER, {
+    props: ({ data }) => ({ ...data })
+    // props: ({ data }) => ({
+    //   me: data.me
+    // })
+  }
+)(App);

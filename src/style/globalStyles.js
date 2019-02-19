@@ -25,3 +25,27 @@ export const ListStyle = css`
     padding:10px;
     box-sizing: border-box;
 `;
+
+export const BoxGap = css`
+    padding-left: 10px;
+    padding-right: 10px;
+`;
+export const UpDownGap = css`
+    padding-top: 6px;
+    padding-bottom: 6px;
+`;
+export const PostBtn = styled.button`
+    cursor: ${props => props.cursorState};
+    background-color: ${props => props.postColor ? props.theme.PostBtnOn : props.theme.PostBtnOff};
+    border-radius: ${props => props.theme.borderRadius};
+    text-align: center;
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    width: 100%;
+    padding: 6px;
+    transition: 0.6s all;
+    outline: 0;
+    border: 0;
+    ${props => props.postState ? `&:hover{ background-color : ${props.theme.PostBtnHover} }` : ''}
+`;

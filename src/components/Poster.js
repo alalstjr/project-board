@@ -37,7 +37,7 @@ class Poster extends Component {
                         <PosteDate>10시간전</PosteDate>
                     </PosterComment>
                     <PosterCommentWrite>
-                        <PosterCommentTextarea />
+                        <PosterCommentTextarea placeholder='Comment..' />
                     </PosterCommentWrite>
                 </PosterContent>
             </PosterBox>

@@ -5,13 +5,17 @@ import App from 'containers/App';
 import { GlobalStyle } from 'style/globalStyles';
 import { ThemeProvider } from 'styled-components';
 import theme from 'style/theme';
+import { ApolloProvider } from "react-apollo";
+import client from "module/apolloClient";
 
 ReactDOM.render(
-    <ThemeProvider theme={theme}>
-        <React.Fragment>
-            <GlobalStyle />
-            <App />
-        </React.Fragment>
-    </ThemeProvider>, 
+    <ApolloProvider client={client}>
+        <ThemeProvider theme={theme}>
+            <React.Fragment>
+                <GlobalStyle />
+                <App />
+            </React.Fragment>
+        </ThemeProvider>
+    </ApolloProvider>, 
     document.getElementById('root')
 );

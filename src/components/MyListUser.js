@@ -1,18 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
+import WriteBtn from './WriteBtn';
 // Style
 import { MyListBox } from 'style/MyList';
-import MyListUser from './MyListUser';
 
-class MyList extends Component {
+class MyListUser extends Component {
+
     render() {
         const { user, handleWriteView } = this.props;
 
         return (
-            <MyListBox>
-                {user ? <MyListUser user={user} handleWriteView={handleWriteView} /> : '회원이 아닙니다.' }
-            </MyListBox>
+            <div>
+                {user.username}
+                <WriteBtn handleWriteView={handleWriteView} />
+            </div>
         );
     }
 }
@@ -26,7 +27,7 @@ const defaultProps = {
     handleWriteView : () => { return console.log('잘못된 전달입니다.') }
 };
 
-MyList.propTypes = propTypes;
-MyList.defaultProps = defaultProps;
+MyListUser.propTypes = propTypes;
+MyListUser.defaultProps = defaultProps;
 
-export default MyList;
+export default MyListUser;

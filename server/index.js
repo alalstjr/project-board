@@ -61,17 +61,12 @@ import {IN_PROD, SESS_NAME, SESS_SECRET, SESS_LIFETIME, PREDIS_HOST, PREDIS_PORT
             context: ({req, res}) => ({req, res})
         });
 
-        app.use('/', express.static(path.resolve(__dirname, '../../build')));
+        app.use('/', express.static(path.resolve(__dirname, '../build')));
 
         // app.use('/api', api);
         /* support client-side routing */
         app.get('*', (req, res) => {
-            res.sendFile(path.resolve(__dirname, './../../build/index.html'));
-        });
-
-        app.get('/login', (req, res) => {
-            console.log('로그인')
-            res.send('로그인')
+            res.sendFile(path.resolve(__dirname, './../build/index.html'));
         });
         
         server.applyMiddleware({ app });
