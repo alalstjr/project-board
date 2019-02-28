@@ -1,4 +1,5 @@
 import { AuthenticationError } from 'apollo-server-express';
+import { Board } from '../models';
 import { User } from '../models';
 import { SESS_NAME } from '../config';
 
@@ -40,4 +41,32 @@ export const signOut = (req, res) => new Promise(
 
         resolve(true);
     })
-})
+});
+
+// Board Like Auth
+export const boardLikeAuth = async (req, id, user) => {
+    if( signedIn(req) !== user ) {
+        throw new AuthenticationError('로그인한 사용자랑 다른 ID 값을 가지고 있습니다.');
+    }
+
+    const like = Board.findOne({_id : id});
+
+    const boardLikeApi = await Board.findOne({ _id: id });
+    const userState = boardLikeApi.boardLike.indexOf(signedIn(req));
+    
+    if( userState === -1 ) {
+        await Board.updateOne({_id : id}, {
+            $push: {
+                boardLike: [signedIn(req)]
+            }
+        });
+    } else {
+        await Board.updateOne({_id : id}, {
+            $pull: {
+                boardLike: signedIn(req)
+            }
+        });
+    }
+
+    return like;
+}

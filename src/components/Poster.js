@@ -1,48 +1,89 @@
-import React, {Component} from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 // Style
-import {PosterBox, PosterHeader, PosterImg, PosterContent, PosterComment, PosterHeaderId, PosterHeaderLocal, PosterEct, PosterTag, PosterViews, PosterCommentBox, PosterCommentList, PosterCommentWrite, PosterCommentTextarea, PosterPost, PosteDate} from 'style/BoardList';
-import SVG from 'img/svg/SVG'
+import {PosterBox, PosterHeader, PosterImg, PosterContent, PosterComment, PosterHeaderId, PosterHeaderLocal, PosterEct, PosterTag, PosterViews, PosterCommentBox, PosterCommentList, PosterCommentWrite, PosterCommentTextarea, PosterPost, PosteDate, Tags } from 'style/BoardList';
+import { UserName } from '../style/globalStyles';
+import TimeAgo from 'react-timeago';
+// graphQL
+import Like from 'components/Like';
 
-class Poster extends Component {
-    render() {
-        return(
-            <PosterBox>
-                <PosterHeader>
-                    <PosterHeaderId>ID</PosterHeaderId>
-                    <PosterHeaderLocal>local</PosterHeaderLocal>
-                </PosterHeader>
-                <PosterImg src={require("../img/test.jpg")}/>
-                <PosterContent>
-                    <PosterEct>
-                        <SVG name="heart" width="2rem" height="2rem" color="#000000" />
-                        <SVG name="heartCk" width="2rem" height="2rem" color="#e74c3c" />
-                    </PosterEct>
-                    <PosterViews>조회수 000회</PosterViews>
-                    <PosterPost>ID 내용</PosterPost>
-                    <PosterTag>
-                        minsang__98
-                        #dailylook#데일리#인친#instagram#셀피#selfie#셀카그램#첫줄#소확행#맞팔환영#인스타그램#선팔하면맞팔#ootd#팔로우#고딩스타그램#좋아요#좋아요반사#인스타#소통#일상#f4f#99#00#01#02#
-                    </PosterTag>
-                    <PosterComment>
-                        <PosterCommentBox>
-                            <PosterCommentList>
-                                sweet__army
-                                @faster.xx
-                            </PosterCommentList>
-                            <PosterCommentList>
-                                vintageboy01
-                                @hanbyulv_v 오떤거 같음?
-                            </PosterCommentList>
-                        </PosterCommentBox>
-                        <PosteDate>10시간전</PosteDate>
-                    </PosterComment>
-                    <PosterCommentWrite>
-                        <PosterCommentTextarea placeholder='Comment..' />
-                    </PosterCommentWrite>
-                </PosterContent>
-            </PosterBox>
-        );
-    }
+const Poster = ({ id, content, tag, secret, createdAt, updatedAt, userName, user, boardLike, file }) => {
+    const tags = tag.map(
+        data => (<Tags key={data.index}>#{data}</Tags>)
+    );
+    const nowLike = boardLike.length;
+
+    return(
+        <PosterBox>
+            <PosterHeader>
+                <PosterHeaderId>{userName}</PosterHeaderId>
+                <PosterHeaderLocal>local</PosterHeaderLocal>
+            </PosterHeader>
+            <PosterImg src={file[0].path}/>
+            <PosterContent>
+                <Like 
+                    id={id}
+                    user={user} 
+                    nowLike={nowLike}
+                    boardLike={boardLike}
+                    likeState={boardLike.indexOf(user) === 0 ? true : false}
+                />
+                <PosterPost>
+                    <UserName>{userName}</UserName>
+                    {content}
+                </PosterPost>
+                <PosterTag>
+                    {tags}
+                </PosterTag>
+                <PosterComment>
+                    <PosterCommentBox>
+                        <PosterCommentList>
+                            sweet__army
+                            @faster.xx
+                        </PosterCommentList>
+                        <PosterCommentList>
+                            vintageboy01
+                            @hanbyulv_v 오떤거 같음?
+                        </PosterCommentList>
+                    </PosterCommentBox>
+                    <PosteDate>
+                        <TimeAgo date={createdAt} live={true}/>
+                    </PosteDate>
+                </PosterComment>
+                <PosterCommentWrite>
+                    <PosterCommentTextarea placeholder='Comment..' />
+                </PosterCommentWrite>
+            </PosterContent>
+        </PosterBox>
+    );
 }
+
+const propTypes = {
+    id: PropTypes.string,
+    content: PropTypes.string,
+    tag: PropTypes.array,
+    secret: PropTypes.bool,
+    createdAt: PropTypes.string,
+    updatedAt: PropTypes.string,
+    userName: PropTypes.string,
+    user: PropTypes.string,
+    boardLike: PropTypes.func,
+    file: PropTypes.array
+};
+const defaultProps = {
+    id: null,
+    content: null,
+    tag: [],
+    secret: false,
+    createdAt: null,
+    updatedAt: null,
+    userName: null,
+    user: null,
+    boardLike: () => console.warn(`not defined`),
+    file: []
+};
+
+Poster.propTypes = propTypes;
+Poster.defaultProps = defaultProps;
 
 export default Poster;

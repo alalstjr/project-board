@@ -1,13 +1,13 @@
 import fetch from "isomorphic-fetch"; 
 // IE 에서는 isomorphic-fetch 를 사용해야 호환가능
 import { ApolloClient } from 'apollo-boost';
-import { HttpLink } from 'apollo-link-http';
+import { createUploadLink  } from 'apollo-upload-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloLink, from } from 'apollo-link';
 
 const cache = new InMemoryCache();
 
-const httpLink = new HttpLink({
+const link = createUploadLink({
     uri: `/graphql`,
     credentials: 'same-origin'
 })
@@ -25,7 +25,7 @@ const httpLink = new HttpLink({
 // });
 
 const client = new ApolloClient({
-    link: httpLink,
+    link,
     // link: from([httpLink, authLink]),
     cache
 });

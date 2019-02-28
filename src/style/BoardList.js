@@ -31,6 +31,8 @@ export const PosterContent = styled.div`
 `;
 export const PosterEct = styled.div`
     padding: 10px;
+    display: inline-block;
+    cursor: pointer;
 `;
 export const PosterViews = styled.div`
     ${BoxGap}
@@ -69,4 +71,8 @@ export const PosterCommentTextarea = styled.textarea.attrs({
     border: none;
     outline: none !important;
     height: 100%;
+`;
+export const Tags = styled.li`
+    display: inline-block;
+    color: #003569;
 `;

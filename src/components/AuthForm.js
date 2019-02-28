@@ -126,7 +126,8 @@ export default withRouter(
                 name: 'signIn',
                 options: {
                     refetchQueries: [
-                        'userAuth'
+                        'userAuth',
+                        'boardList'
                     ]
                     // refetchQueries: [{
                     //     query: queryName
@@ -139,7 +140,8 @@ export default withRouter(
                 name: 'signUp',
                 options: {
                     refetchQueries: [
-                        'userAuth'
+                        'userAuth',
+                        'boardList'
                     ]
                 }
             }

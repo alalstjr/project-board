@@ -3,12 +3,13 @@ import { ApolloServer } from "apollo-server-express";
 import typeDefs from './typeDefs';
 import resolvers from './resolvers';
 import schemaDirectives from './directives';
+import { processUpload } from './utils/upload'
 
 // Express
 import express from 'express';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
-import path from 'path';
+import { resolve } from 'path';
 
 // mongoose
 import mongoose from 'mongoose';
@@ -58,15 +59,24 @@ import {IN_PROD, SESS_NAME, SESS_SECRET, SESS_LIFETIME, PREDIS_HOST, PREDIS_PORT
                     'request.credentials': 'include'
                 }
             },
-            context: ({req, res}) => ({req, res})
+            context({ req, res }) {
+                return {
+                    utils: {
+                        processUpload
+                    },
+                    req,
+                    res
+                }
+            }
+            // context: ({req, res}) => ({req, res})
         });
 
-        app.use('/', express.static(path.resolve(__dirname, '../build')));
+        app.use('/', express.static(resolve(__dirname, '../build')));
 
         // app.use('/api', api);
         /* support client-side routing */
         app.get('*', (req, res) => {
-            res.sendFile(path.resolve(__dirname, './../build/index.html'));
+            res.sendFile(resolve(__dirname, './../build/index.html'));
         });
         
         server.applyMiddleware({ app });

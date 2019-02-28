@@ -1,5 +1,5 @@
 const theme = {
-    backColor: '#fbf1ff',
+    backColor: '#fafafa',
     borderSet: '1px solid #dbdbdb',
     contentColor: '#ffffff',
     fontSizeSm: '14px',

@@ -49,3 +49,8 @@ export const PostBtn = styled.button`
     border: 0;
     ${props => props.postState ? `&:hover{ background-color : ${props.theme.PostBtnHover} }` : ''}
 `;
+export const UserName = styled.div`
+    font-weight: bold;
+    margin-right: 10px;
+    display: inline-block;
+`;

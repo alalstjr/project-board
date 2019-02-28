@@ -77,6 +77,17 @@ export const SecretOption = styled.div`
     ${BoxGap}
     ${UpDownGap}
 `;
+export const SecretBox = styled.div`
+    display:inline-block;
+    padding: 5px 15px;
+    cursor: pointer;
+    font-weight: bold;
+    border: ${props => props.theme.borderSet};
+    ${props => props.secret ? 'border-color: #ff3b80' :  '' };
+    ${props => props.secret ? 'color: #fff' :  '' };
+    background-color: ${props => props.secret ? '#ff3b80' :  '#ffffff' };
+    border-radius: ${props => props.theme.borderRadius};
+`;
 export const WritePost = styled.div`
     ${BoxGap}
     ${UpDownGap}

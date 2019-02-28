@@ -6,7 +6,6 @@ import { AUTH_LOGOUT } from 'module/Mutation'
 import {Header, BoardList, MyList} from 'components';
 // Style
 import { Container } from 'style/globalStyles';
-import { Tag, WriteHeaderPart } from 'style/Write';
 // Js
 import {sideFix, resizeFunc} from 'js/sidefix';
 // Component
@@ -21,7 +20,8 @@ class Home extends Component {
             writeText: '',
             tagText: '',
             tagSize: '1',
-            tagList: []
+            tagList: [],
+            secret: false
         }
 
         // ESC 키를 누르십시오. 눌렀을 때 닫습니다.
@@ -66,13 +66,19 @@ class Home extends Component {
     handleText = (e) => {
         let keyword = e.target.value;
         
+        
         this.setState({
             writeText: keyword
         });
     }
     handleTagText = (e) => {
         let keyword = (e.target.value).trim();
-        let size = keyword.length ? keyword.length : '1';
+        let size = keyword.length ? (keyword.length * 2) : '1';
+
+        if( keyword.length > 20 ) { 
+            console.log('너무깁니다.');
+            return false;
+        }
 
         this.setState({
             tagText: keyword,
@@ -85,20 +91,42 @@ class Home extends Component {
         if( (e.keyCode === 32 || e.keyCode === 13) && tagText ) {
             let tagVal = tagText;
 
+            
+            if( tagList.filter( tag => tag === tagText ).length >= 1 ) {
+                return false;
+            }
+
             this.setState({
                 tagList: tagList.concat(tagVal),
                 tagText: ''
             });
         }
     }
-    handleTagRemove = (arsd) => {
+    handleTagRemove = (arg) => {
         const { tagList } = this.state;
-        console.log(arsd)
+        
         this.setState({
-            tagList: tagList.filter( tag => tag !== arsd)
+            tagList: tagList.filter( tag => tag !== arg)
         });
+    }
+    handleSecret = () => {
+        let secretSwitch = false;
 
-        console.log(tagList)
+        this.state.secret ? secretSwitch = false : secretSwitch = true ;
+
+        this.setState({
+            secret : secretSwitch
+        });
+    }
+    handleWriteReset = () => {
+        this.setState({
+            writeView: false,
+            writeText: '',
+            tagText: '',
+            tagSize: '1',
+            tagList: [],
+            secret: false
+        });
     }
 
     render() {
@@ -114,7 +142,9 @@ class Home extends Component {
                 <Container 
                     listTop={true} 
                 >
-                    <BoardList/>
+                    <BoardList
+                        user={user}
+                    />
                     <MyList 
                         user={user} 
                         handleWriteView={this.handleWriteView}
@@ -129,8 +159,11 @@ class Home extends Component {
                     tagText={this.state.tagText}
                     tagSize={this.state.tagSize}
                     tagList={this.state.tagList}
+                    secret={this.state.secret}
                     handleTagEvent={this.handleTagEvent}
                     handleTagRemove={this.handleTagRemove}
+                    handleSecret={this.handleSecret}
+                    handleWriteReset={this.handleWriteReset}
                 /> : ''}
             </React.Fragment>
         );
